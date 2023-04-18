@@ -4,10 +4,11 @@
 
 ## usage
 
-1. Replace `std::enable_shared_from_this` with `must_be_shared`.
+1. Replace `std::shared_ptr` with `must_be_shared`.
 1. Place the constructor in `public`.
-1. Add `const magic_t& _` to the first argument of the constructor.
-1. Add `must_be_shared<XX>(_)` in constructor initializer.
+1. Add `const magic_t& _` in the first argument of the constructor.
+1. Add `must_be_shared<XXX>(_)` in the constructor initializer. (`XXX` is your class name)
+1. Set the second and subsequent arguments of the constructor to the creation function `create()`.
 
 It requires that the constructor be placed `public`, but it is not possible to create it locally, as there is no way to create a `magic_t` as `public`.
 
