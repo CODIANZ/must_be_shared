@@ -3,53 +3,6 @@
 
 #include <memory>
 
-/**
- * 
- * Usage:
- * 
- * class FOO : public must_be_shared<FOO> {
- * private:
- *   int foo_value_;
- * public:
- *   FOO(int foo_value, const magic_t& _):
- *     must_be_shared<FOO>(_),
- *     foo_value_(foo_value)
- *     {}
- *   void foo() {
- *     auto instance = shared_from_this();
- *     std::cout << instance->foo_value_ << std::endl;
- *   }
- * };
- * 
- * 
- * class BAR : public FOO {
- * private:
- *   int bar_value_;
- * public:
- *   BAR(int bar_value, int foo_value, const FOO::magic_t& _):
- *     FOO(foo_value, _),
- *     bar_value_(bar_value)
- *      {}
- *   void bar() {
- *     auto instance = shared_from_this_as<BAR>(); // `shared_from_this`
- *     std::cout << instance->bar_value_ << std::endl;
- *   }
- * };
- * 
- * 
- * int main() {
- *   auto bar = BAR::create<BAR>(10, 20);
- *  bar->foo();
- *  bar->bar();
- *
- *  auto foo = BAR::create<BAR, FOO>(10, 20); // If you want to manage with a base class
- *  foo->foo();
- *  // foo->bar(); // <-- compile error
- *  foo->shared_from_this_as<BAR>()->bar();
- * }
- * 
- **/
-
 template <typename T> class must_be_shared :
   public std::enable_shared_from_this<T>
 {
@@ -66,13 +19,13 @@ public:
 
   template <typename ...ARGS>
   static auto create(ARGS&&...args) {
-    return std::make_shared<T>(std::forward<ARGS>(args)..., _magic{_magic_seed{}});
+    return std::make_shared<T>(_magic{_magic_seed{}}, std::forward<ARGS>(args)...);
   }
 
   template <typename Derived, typename OutType = Derived, typename ...ARGS>
   static auto create(ARGS&&...args) {
     return std::static_pointer_cast<OutType>(
-      std::make_shared<Derived>(std::forward<ARGS>(args)..., _magic{_magic_seed{}})
+      std::make_shared<Derived>(_magic{_magic_seed{}}, std::forward<ARGS>(args)...)
     );
   }
 
